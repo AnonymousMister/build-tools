@@ -1,0 +1,30 @@
+variables:
+  DINGTALK_MESSAGE_TOKEN: "01cebc7f61216646a801ea3251d8dbbab9fddac3017c760a44f60a5dff294c1c"
+  DINGTALK_MESSAGE_TYPE: "markdown"
+  DINGTALK_MESSAGE_SECRET: "SEC67efdad52e3663cd43e36dc788e7b4f1ecd6dbf9af061bfd340ec54c75db450a"
+  CGO_ENABLED: 0
+  GO111MODULE: "on"
+
+default:
+  tags:
+    - kaij-docker-dingtalk
+
+stages:
+  - dryrun
+
+
+build-dryrun:
+  stage: dryrun
+  image: plugins/docker
+  only:
+    - master
+  variables:
+    PLUGIN_DOCKERFILE: "$CI_PROJECT_DIR/Dockerfile"
+    PLUGIN_TAGS: "latest,1.0.0"
+    PLUGIN_REPO: "wumingq/gitlab-dingtalk"
+    PLUGIN_CONTEXT: "$CI_PROJECT_DIR/"
+  script:
+    - sh /usr/local/bin/dockerd-entrypoint.sh
+    - sh /bin/drone-docker
+
+

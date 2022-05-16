@@ -1,0 +1,7 @@
+dive.log
+.idea
+vendor
+coverage.txt
+coverage.out
+env.list
+/logs/

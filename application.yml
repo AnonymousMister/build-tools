@@ -1,0 +1,12 @@
+server:
+  hostPort: ':8081'
+datasource:
+  type: 'mysql'
+  host: '192.168.1.146'
+  port: '3306'
+  db: 'wjrb_test'
+  username: 'kf_only'
+  password: '123456'
+logger:
+  path: "./logs/"
+
