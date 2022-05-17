@@ -10,8 +10,9 @@ var (
 	stepmap = make(map[string]cli.ActionFunc)
 	flag    = []cli.Flag{
 		&cli.StringFlag{
-			Name:  "step",
-			Usage: "step 步骤 可选值：java,docker,artifacts,node",
+			Name:    "step",
+			Usage:   "step 步骤 可选值：java,docker,artifacts,node",
+			EnvVars: []string{"BUILD_TOOLS_STEP"},
 		},
 	}
 )
