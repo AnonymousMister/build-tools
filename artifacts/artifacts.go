@@ -82,7 +82,7 @@ func New(source string, target string) (*Artifacts, error) {
 	return artifacts, nil
 }
 
-func (a Artifacts) SetSource(source string) error {
+func (a *Artifacts) SetSource(source string) error {
 	if source == "" {
 		return errors.New("source 不能为空")
 	}
@@ -96,7 +96,7 @@ func (a Artifacts) SetSource(source string) error {
 	return nil
 }
 
-func (a Artifacts) SetTarget(target string) error {
+func (a *Artifacts) SetTarget(target string) error {
 	if target == "" {
 		return errors.New("source 不能为空")
 	}
@@ -110,7 +110,7 @@ func (a Artifacts) SetTarget(target string) error {
 	return nil
 }
 
-func (a Artifacts) CopyFile() (written int64, err error) {
+func (a *Artifacts) CopyFile() (written int64, err error) {
 	srcFile, err := os.Open(a.source)
 	if err != nil {
 		fmt.Println("open file err:", err)

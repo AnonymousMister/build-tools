@@ -64,8 +64,8 @@ func steprDocker(c *cli.Context) error {
 		Tags:           tags,
 		DockerRegistry: dockerRegistry,
 		Option:         option,
+		commandName:    "docker",
 	}
-
 	err := docker.Build()
 	if err != nil {
 		return err
@@ -89,6 +89,7 @@ type Docker struct {
 	Option         []string
 	DockerRegistry string
 	Tags           []string
+	commandName    string
 }
 
 func (d *Docker) Build() error {
@@ -97,7 +98,7 @@ func (d *Docker) Build() error {
 		options = append(options, d.Option...)
 	}
 	options = append(options, "build", "-t", d.DockerRegistry+":"+d.Tags[0], ".")
-	return exec.ExecCommand("docker", options)
+	return exec.ExecCommand(d.commandName, options)
 }
 
 func (d *Docker) Tag() error {
@@ -109,8 +110,8 @@ func (d *Docker) Tag() error {
 		if i == 0 {
 			continue
 		}
-		params := append(options, "tag", "-t", d.DockerRegistry+":"+d.Tags[0], d.DockerRegistry+":"+tag)
-		err := exec.ExecCommand("docker", params)
+		params := append(options, "tag", d.DockerRegistry+":"+d.Tags[0], d.DockerRegistry+":"+tag)
+		err := exec.ExecCommand(d.commandName, params)
 		if err != nil {
 			return err
 		}
@@ -124,7 +125,7 @@ func (d *Docker) Push() error {
 	}
 	for _, tag := range d.Tags {
 		params := append(options, "push", d.DockerRegistry+":"+tag)
-		err := exec.ExecCommand("docker", params)
+		err := exec.ExecCommand(d.commandName, params)
 		if err != nil {
 			return err
 		}
@@ -138,7 +139,7 @@ func (d *Docker) Rmi() error {
 	}
 	for _, tag := range d.Tags {
 		params := append(options, "rmi", d.DockerRegistry+":"+tag)
-		err := exec.ExecCommand("docker", params)
+		err := exec.ExecCommand(d.commandName, params)
 		if err != nil {
 			return err
 		}
