@@ -3,6 +3,7 @@ package docker
 import (
 	"build-tools/exec"
 	"build-tools/step"
+	"fmt"
 	"github.com/urfave/cli/v2"
 	"strings"
 )
@@ -49,6 +50,9 @@ func InitDockerFlag() []cli.Flag {
 }
 
 func steprDocker(c *cli.Context) error {
+	fmt.Println("********************************************")
+	fmt.Println("***********    docker 阶段开始    ***********")
+	fmt.Println("********************************************")
 	tags := strings.Split(c.String("docker-tag"), ",")
 	dockerRegistry := c.String("docker-url")
 	dockerNamespace := c.String("docker-namespace")

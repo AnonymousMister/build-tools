@@ -2,6 +2,7 @@ package java
 
 import (
 	"build-tools/exec"
+	"fmt"
 	"github.com/urfave/cli/v2"
 )
 
@@ -46,6 +47,9 @@ func (m *Maven) Install() error {
 }
 
 func maven(c *cli.Context) error {
+	fmt.Println("********************************************")
+	fmt.Println("***********     maven 阶段开始    ***********")
+	fmt.Println("********************************************")
 	maven := Maven{
 		option:   c.String("maven-option"),
 		profiles: c.String("maven-profiles"),

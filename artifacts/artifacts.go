@@ -44,6 +44,9 @@ func InitArtifactsFlag() []cli.Flag {
 }
 
 func steprAtifacts(c *cli.Context) error {
+	fmt.Println("********************************************")
+	fmt.Println("***********   artifacts 阶段开始  ***********")
+	fmt.Println("********************************************")
 	str, _ := os.Getwd()
 	folderPath := filepath.Join(str, "artifacts")
 	if _, err := os.Stat(folderPath); os.IsNotExist(err) {

@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"golang.org/x/text/encoding/simplifiedchinese"
 	"io"
-	"log"
 	"os"
 	"os/exec"
 )
@@ -35,7 +34,7 @@ func ExecCommand(commandName string, params []string) error {
 		in := bufio.NewScanner(stdout)
 		for in.Scan() {
 			cmdRe := ConvertByte2String(in.Bytes(), "UTF8")
-			log.Println(cmdRe)
+			fmt.Println(cmdRe)
 		}
 	}()
 	// 错误日志
