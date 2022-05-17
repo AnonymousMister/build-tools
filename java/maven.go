@@ -1,20 +1,16 @@
 package java
 
 import (
+	"build-tools/exec"
 	"github.com/urfave/cli/v2"
-
-	"github.com/AnonymousMister/build-tools/exec"
 )
 
 var MavenCommand = cli.Command{
-	Name:   "java-maven",
+	Name:   "maven",
 	Usage:  "java maven 编译",
 	Action: maven,
 	Flags:  InitMavenFlag(),
 }
-
-
-
 
 func InitMavenFlag() []cli.Flag {
 	flag := []cli.Flag{
@@ -32,25 +28,27 @@ func InitMavenFlag() []cli.Flag {
 	return flag
 }
 
-
 type Maven struct {
-	option string
+	option   string
 	profiles string
+}
+
+func (m *Maven) Install() error {
+	var option []string
+	if m.option != "" {
+		option = append(option, m.option)
+	}
+	option = append(option, "install")
+	if m.profiles != "" {
+		option = append(option, "-P", m.profiles)
+	}
+	return exec.ExecCommand("mvn", option)
 }
 
 func maven(c *cli.Context) error {
 	maven := Maven{
-		option: c.String("maven-option"),
-		profiles:  c.String("maven-profiles"),
+		option:   c.String("maven-option"),
+		profiles: c.String("maven-profiles"),
 	}
-	var option []string
-	if maven.option != ""	{
-		option = append(option, maven.option)
-	}
-	option = append(option, "install")
-	if maven.profiles != ""	{
-		option = append(option,"-P", maven.profiles)
-	}
-	exec.ExecCommand("mvn", option)
-	return nil
+	return maven.Install()
 }

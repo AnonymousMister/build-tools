@@ -2,9 +2,12 @@ package exec
 
 import (
 	"bufio"
+	"bytes"
+	"errors"
 	"fmt"
 	"golang.org/x/text/encoding/simplifiedchinese"
 	"io"
+	"log"
 	"os"
 	"os/exec"
 )
@@ -16,36 +19,52 @@ const (
 	GB18030 = Charset("GB18030")
 )
 
-
 //封装一个函数来执行命令
-func ExecCommand(commandName string, params []string) bool {
-
+func ExecCommand(commandName string, params []string) error {
 	//执行命令
-	cmd := exec.Command(commandName,params...)
-
+	cmd := exec.Command(commandName, params...)
 	//显示运行的命令
 	fmt.Println(cmd.Args)
-
-	stdout, err := cmd.StdoutPipe()
-	errReader,errr := cmd.StderrPipe()
-
-	if errr != nil{
-		fmt.Println("err:"+errr.Error())
+	stdout, _ := cmd.StdoutPipe()
+	errReader, _ := cmd.StderrPipe()
+	e := cmd.Start()
+	if e != nil {
+		return e
 	}
-	//开启错误处理
-	go handlerErr(errReader)
-	if err != nil {
-		fmt.Println(err)
-		return false
+	go func() {
+		in := bufio.NewScanner(stdout)
+		for in.Scan() {
+			cmdRe := ConvertByte2String(in.Bytes(), "UTF8")
+			log.Println(cmdRe)
+		}
+	}()
+	// 错误日志
+	errBuf := bytes.NewBufferString("")
+	scan := bufio.NewScanner(errReader)
+	for scan.Scan() {
+		s := scan.Text()
+		errBuf.WriteString(s)
+		errBuf.WriteString("\n")
 	}
-	cmd.Start()
-	in := bufio.NewScanner(stdout)
+	// 等待命令执行完
+	e = cmd.Wait()
+	if !cmd.ProcessState.Success() {
+		// 执行失败，返回错误信息
+		if errBuf.Len() > 0 {
+			return errors.New(errBuf.String())
+		}
+		return e
+	}
+	return nil
+}
+
+//开启一个协程来输出错误
+func handlerErr(errReader io.ReadCloser) {
+	in := bufio.NewScanner(errReader)
 	for in.Scan() {
-		cmdRe:=ConvertByte2String(in.Bytes(),"UTF8")
-		fmt.Println("->",cmdRe)
+		cmdRe := ConvertByte2String(in.Bytes(), "UTF8")
+		fmt.Errorf(cmdRe)
 	}
-	cmd.Wait()
-	return true
 }
 
 func check(e error) {
@@ -65,22 +84,13 @@ func CheckFileIsExist(filename string) bool {
 	return exist
 }
 
-//开启一个协程来输出错误
-func handlerErr(errReader io.ReadCloser){
-	in := bufio.NewScanner(errReader)
-	for in.Scan() {
-		cmdRe:=ConvertByte2String(in.Bytes(),"UTF8")
-		fmt.Errorf(cmdRe)
-	}
-}
-
 //对字符进行转码
 func ConvertByte2String(byte []byte, charset Charset) string {
 	var str string
 	switch charset {
 	case GB18030:
-		var decodeBytes,_=simplifiedchinese.GB18030.NewDecoder().Bytes(byte)
-		str= string(decodeBytes)
+		var decodeBytes, _ = simplifiedchinese.GB18030.NewDecoder().Bytes(byte)
+		str = string(decodeBytes)
 	case UTF8:
 		fallthrough
 	default:

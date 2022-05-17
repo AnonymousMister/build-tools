@@ -1,21 +1,24 @@
 package main
 
 import (
+	"build-tools/artifacts"
+	"build-tools/docker"
+	"build-tools/java"
+	"build-tools/step"
 	"fmt"
-	"github.com/AnonymousMister/build-tools/java"
-	"github.com/AnonymousMister/build-tools/step"
 	"github.com/urfave/cli/v2"
 	"os"
 )
 
-
 func main() {
 	var app = &cli.App{
-		Usage: "编译辅助工具",
+		Usage:  "编译辅助工具",
 		Action: step.Step,
-		Flags: step.InitStepFlag(),
+		Flags:  step.InitStepFlag(),
 		Commands: []*cli.Command{
 			&java.MavenCommand,
+			&artifacts.ArtifactsCommand,
+			&docker.DockerCommand,
 		},
 		Version: "0.1",
 	}
@@ -24,4 +27,3 @@ func main() {
 		os.Exit(1)
 	}
 }
-

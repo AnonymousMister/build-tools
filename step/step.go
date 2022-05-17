@@ -1,12 +1,19 @@
 package step
 
 import (
-	"github.com/AnonymousMister/build-tools/java"
-	"github.com/urfave/cli"
+	"errors"
+	"github.com/urfave/cli/v2"
+	"strings"
 )
 
 var (
-	stepmap   = make(map[string]cli.ActionFunc)
+	stepmap = make(map[string]cli.ActionFunc)
+	flag    = []cli.Flag{
+		&cli.StringFlag{
+			Name:  "step",
+			Usage: "step 步骤 可选值：java,docker,artifacts,node",
+		},
+	}
 )
 
 type Factory struct {
@@ -18,18 +25,19 @@ func RegisterStepmap(factory *Factory) {
 	stepmap[factory.Name] = factory.F
 }
 
+func RegisterStepFlag(flags []cli.Flag) {
+	flag = append(flag, flags...)
+}
+
 func InitStepFlag() []cli.Flag {
-	flag := []cli.Flag{
-		&cli.StringSliceFlag{
-			Name:    "step",
-			Usage:   "step 步骤 可选值：java,docker,artifacts,node",
-		},
-	}
-	flag = append(flag, java.InitMavenFlag()...)
 	return flag
 }
 func Step(c *cli.Context) error {
-	steps:=c.StringSlice("step")
+	step := c.String("step")
+	if step == "" {
+		return errors.New("step 不能是空的")
+	}
+	steps := strings.Split(step, ",")
 	for _, step := range steps {
 		if f, ok := stepmap[step]; ok {
 			err := f(c)

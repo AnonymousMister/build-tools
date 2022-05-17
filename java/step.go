@@ -1,18 +1,20 @@
 package java
 
 import (
+	"build-tools/exec"
+	"build-tools/step"
 	"errors"
-	"github.com/AnonymousMister/build-tools/exec"
-	"github.com/AnonymousMister/build-tools/step"
-	"github.com/urfave/cli"
+	"github.com/urfave/cli/v2"
 )
+
 func init() {
 	step.RegisterStepmap(&step.Factory{
 		F:    stepJava,
 		Name: "java",
 	})
+	step.RegisterStepFlag(InitMavenFlag())
 }
-func stepJava(c *cli.Context) error{
+func stepJava(c *cli.Context) error {
 	if exec.CheckFileIsExist("pom.xml") {
 		return maven(c)
 	}
