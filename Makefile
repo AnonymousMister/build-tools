@@ -1,6 +1,5 @@
 build-no: build-liunx build-windows build-darwin
 
-
 build: push-linux build-windows build-darwin
 
 build-liunx:main.go
