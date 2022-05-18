@@ -2,6 +2,7 @@ package step
 
 import (
 	"errors"
+	"fmt"
 	"github.com/urfave/cli/v2"
 	"strings"
 )
@@ -45,6 +46,8 @@ func Step(c *cli.Context) error {
 			if err != nil {
 				return err
 			}
+		} else {
+			fmt.Println(step + " 不存在")
 		}
 	}
 	return nil
