@@ -1,4 +1,7 @@
-build: build-liunx build-windows build-darwin
+build-no: build-liunx build-windows build-darwin
+
+
+build: push-linux build-windows build-darwin
 
 build-liunx:main.go
 	GO111MODULE=on CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build  -ldflags "-s -w" -a -o build-tools .

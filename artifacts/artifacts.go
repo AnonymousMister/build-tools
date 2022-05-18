@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"github.com/urfave/cli/v2"
 	"io"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -59,8 +60,7 @@ func steprAtifacts(c *cli.Context) error {
 	if err != nil {
 		return err
 	}
-	_, err = artifacts.CopyFile()
-	return err
+	return artifacts.CopyFile()
 }
 
 type Artifacts struct {
@@ -73,6 +73,9 @@ func New(source string, target string) (*Artifacts, error) {
 	str, _ := os.Getwd()
 	artifacts := &Artifacts{
 		workDir: str,
+	}
+	if source == "" {
+		source = target
 	}
 	err := artifacts.SetSource(source)
 	if err != nil {
@@ -113,24 +116,42 @@ func (a *Artifacts) SetTarget(target string) error {
 	return nil
 }
 
-func (a *Artifacts) CopyFile() (written int64, err error) {
-	srcFile, err := os.Open(a.source)
-	if err != nil {
-		fmt.Println("open file err:", err)
+func (a *Artifacts) Copy(from, to string) error {
+	f, e := os.Stat(from)
+	if e != nil {
+		return e
 	}
-	//关闭流
-	defer srcFile.Close()
-	//获取到reader
-	reader := bufio.NewReader(srcFile)
-	//打开dstFileName
-	dstFile, err := os.OpenFile(a.target, os.O_WRONLY|os.O_CREATE, 0666) //0666 在windos下无效
-	if err != nil {
-		fmt.Println("open file err:", err)
-		return
+	if f.IsDir() {
+		if list, e := ioutil.ReadDir(from); e == nil {
+			for _, item := range list {
+				if e = a.Copy(filepath.Join(from, item.Name()), filepath.Join(to, item.Name())); e != nil {
+					return e
+				}
+			}
+		}
+	} else {
+		p := filepath.Dir(to)
+		if _, e := os.Stat(p); e != nil {
+			if e = os.MkdirAll(p, 0777); e != nil {
+				return e
+			}
+		}
+		file, e := os.Open(from)
+		if e != nil {
+			return e
+		}
+		defer file.Close()
+		bufReader := bufio.NewReader(file)
+		out, e := os.Create(to)
+		if e != nil {
+			return e
+		}
+		defer out.Close()
+		_, e = io.Copy(out, bufReader)
 	}
-	writer := bufio.NewWriter(dstFile)
-	//关闭流
-	defer dstFile.Close()
-	//调用copy函数
-	return io.Copy(writer, reader)
+	return e
+}
+
+func (a *Artifacts) CopyFile() error {
+	return a.Copy(a.source, a.target)
 }

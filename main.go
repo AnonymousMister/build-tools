@@ -4,6 +4,7 @@ import (
 	"build-tools/artifacts"
 	"build-tools/docker"
 	"build-tools/java"
+	"build-tools/node"
 	"build-tools/step"
 	"fmt"
 	"github.com/urfave/cli/v2"
@@ -19,6 +20,7 @@ func main() {
 			&java.MavenCommand,
 			&artifacts.ArtifactsCommand,
 			&docker.DockerCommand,
+			&node.NpmCommand,
 		},
 		Version: "0.1",
 	}

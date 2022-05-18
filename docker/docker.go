@@ -2,6 +2,7 @@ package docker
 
 import (
 	"build-tools/exec"
+	"build-tools/glb"
 	"build-tools/step"
 	"fmt"
 	"github.com/urfave/cli/v2"
@@ -64,11 +65,15 @@ func steprDocker(c *cli.Context) error {
 	if configFile != "" {
 		option = append(option, "--config="+configFile)
 	}
+	commandName := "docker"
+	if glb.IsDebug {
+		commandName = "podman"
+	}
 	docker := &Docker{
 		Tags:           tags,
 		DockerRegistry: dockerRegistry,
 		Option:         option,
-		commandName:    "docker",
+		commandName:    commandName,
 	}
 	err := docker.Build()
 	if err != nil {
