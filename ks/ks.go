@@ -4,6 +4,7 @@ import (
 	"build-tools/exec"
 	"build-tools/glb"
 	"build-tools/step"
+	"errors"
 	"fmt"
 	"github.com/urfave/cli/v2"
 )
@@ -38,17 +39,29 @@ func steprks(c *cli.Context) error {
 	fmt.Println("********************************************")
 	fmt.Println("*************    ks 阶段开始    *************")
 	fmt.Println("********************************************")
-	ks := &kubectl{
-		Namespace: c.String("ks-namespace"),
+	namespace := c.String("ks-namespace")
+	if namespace == "" {
+		namespace = findNamespace()
 	}
-
+	if namespace == "" {
+		return errors.New("没有找到 空间")
+	}
+	ks := &kubectl{
+		Namespace: namespace,
+	}
 	val, e := exec.ExecCommand("kubectl", []string{
 		"get", "Deployment", "-n" + ks.Namespace, "-ojson",
 	})
+	if val == "" {
+		return errors.New("没有找到 下发对象")
+	}
 	if e != nil {
 		return e
 	}
 	dep := finddockimage(val)
+	if dep == nil {
+		return errors.New("没有找到 可以跟新对象")
+	}
 	ks.Deployment = dep
 	return ks.SetImage(glb.Con.Docker.Tags[0])
 }
@@ -63,7 +76,7 @@ func (d *kubectl) SetImage(tag string) error {
 		"set", "image", "Deployment", d.Deployment.Name, d.Deployment.ImName + "=" + d.Deployment.Image + ":" + tag, "-n" + d.Namespace,
 	})
 	if e == nil {
-		fmt.Println(fmt.Sprintf("跟新下发成功  镜像 %s", tag))
+		fmt.Println(fmt.Sprintf("更新下发成功  镜像 %s", tag))
 	}
 	return e
 }

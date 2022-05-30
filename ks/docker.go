@@ -13,12 +13,21 @@ type Deployment struct {
 	Image  string
 }
 
+func findNamespace() string {
+	if glb.Con.Docker == nil {
+		return ""
+	}
+	if glb.Con.Docker.DockerRegistry == "" {
+		return ""
+	}
+	spt := strings.Split(glb.Con.Docker.DockerRegistry, "/")
+	return spt[len(spt)-1]
+
+}
+
 func finddockimage(json string) *Deployment {
-	if glb.IsDebug {
-		glb.Con.Docker = &glb.DockerContext{
-			Tags:           []string{"11b606e7-dslyjava", "aaa-dslyjava"},
-			DockerRegistry: "registry.cn-hangzhou.aliyuncs.com/winjoin/scygkj",
-		}
+	if glb.Con.Docker == nil {
+		return nil
 	}
 	dep := &Deployment{}
 	quer := func(q *gojsonq.JSONQ) *gojsonq.JSONQ {
