@@ -19,7 +19,7 @@ const (
 )
 
 //封装一个函数来执行命令
-func ExecCommand(commandName string, params []string) error {
+func ExecCommand(commandName string, params []string) (string, error) {
 	//执行命令
 	cmd := exec.Command(commandName, params...)
 	//显示运行的命令
@@ -28,15 +28,17 @@ func ExecCommand(commandName string, params []string) error {
 	errReader, _ := cmd.StderrPipe()
 	e := cmd.Start()
 	if e != nil {
-		return e
+		return "", e
 	}
-	go func() {
+	infoBuf := bytes.NewBufferString("")
+	go func(buf *bytes.Buffer) {
 		in := bufio.NewScanner(stdout)
 		for in.Scan() {
 			cmdRe := ConvertByte2String(in.Bytes(), "UTF8")
 			fmt.Println(cmdRe)
+			buf.WriteString(cmdRe)
 		}
-	}()
+	}(infoBuf)
 	// 错误日志
 	errBuf := bytes.NewBufferString("")
 	scan := bufio.NewScanner(errReader)
@@ -50,11 +52,11 @@ func ExecCommand(commandName string, params []string) error {
 	if !cmd.ProcessState.Success() {
 		// 执行失败，返回错误信息
 		if errBuf.Len() > 0 {
-			return errors.New(errBuf.String())
+			return "", errors.New(errBuf.String())
 		}
-		return e
+		return "", e
 	}
-	return nil
+	return infoBuf.String(), nil
 }
 
 //开启一个协程来输出错误

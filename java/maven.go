@@ -43,7 +43,8 @@ func (m *Maven) Install() error {
 	if m.profiles != "" {
 		option = append(option, "-P", m.profiles)
 	}
-	return exec.ExecCommand("mvn", option)
+	_, e := exec.ExecCommand("mvn", option)
+	return e
 }
 
 func maven(c *cli.Context) error {

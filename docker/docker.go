@@ -69,9 +69,15 @@ func steprDocker(c *cli.Context) error {
 	if glb.IsDebug {
 		commandName = "podman"
 	}
-	docker := &Docker{
-		Tags:           tags,
+
+	dockerContext := &glb.DockerContext{
 		DockerRegistry: dockerRegistry,
+		Tags:           tags,
+	}
+	glb.Con.Docker = dockerContext
+	docker := &Docker{
+		DockerRegistry: dockerRegistry,
+		Tags:           tags,
 		Option:         option,
 		commandName:    commandName,
 	}
@@ -95,9 +101,9 @@ func steprDocker(c *cli.Context) error {
 }
 
 type Docker struct {
-	Option         []string
 	DockerRegistry string
 	Tags           []string
+	Option         []string
 	commandName    string
 }
 
@@ -107,7 +113,8 @@ func (d *Docker) Build() error {
 		options = append(options, d.Option...)
 	}
 	options = append(options, "build", "-t", d.DockerRegistry+":"+d.Tags[0], ".")
-	return exec.ExecCommand(d.commandName, options)
+	_, err := exec.ExecCommand(d.commandName, options)
+	return err
 }
 
 func (d *Docker) Tag() error {
@@ -120,7 +127,7 @@ func (d *Docker) Tag() error {
 			continue
 		}
 		params := append(options, "tag", d.DockerRegistry+":"+d.Tags[0], d.DockerRegistry+":"+tag)
-		err := exec.ExecCommand(d.commandName, params)
+		_, err := exec.ExecCommand(d.commandName, params)
 		if err != nil {
 			return err
 		}
@@ -134,7 +141,7 @@ func (d *Docker) Push() error {
 	}
 	for _, tag := range d.Tags {
 		params := append(options, "push", d.DockerRegistry+":"+tag)
-		err := exec.ExecCommand(d.commandName, params)
+		_, err := exec.ExecCommand(d.commandName, params)
 		if err != nil {
 			return err
 		}
@@ -148,7 +155,7 @@ func (d *Docker) Rmi() error {
 	}
 	for _, tag := range d.Tags {
 		params := append(options, "rmi", d.DockerRegistry+":"+tag)
-		err := exec.ExecCommand(d.commandName, params)
+		_, err := exec.ExecCommand(d.commandName, params)
 		if err != nil {
 			return err
 		}

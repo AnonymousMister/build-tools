@@ -4,6 +4,7 @@ import (
 	"build-tools/artifacts"
 	"build-tools/docker"
 	"build-tools/java"
+	"build-tools/ks"
 	"build-tools/node"
 	"build-tools/step"
 	"fmt"
@@ -21,6 +22,7 @@ func main() {
 			&artifacts.ArtifactsCommand,
 			&docker.DockerCommand,
 			&node.NpmCommand,
+			&ks.KS,
 		},
 		Version: "0.1",
 	}

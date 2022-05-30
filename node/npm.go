@@ -57,7 +57,10 @@ func (n *Npm) RunProfile() error {
 			"v14.19.1",
 		})
 	}
-	return exec.ExecCommand("npm", option)
+
+	_, e := exec.ExecCommand("npm", option)
+
+	return e
 }
 
 func npm(c *cli.Context) error {
