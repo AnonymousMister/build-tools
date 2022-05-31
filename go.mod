@@ -3,6 +3,7 @@ module build-tools
 go 1.17
 
 require (
+	github.com/AnonymousMister/dingtalk-robot v0.0.1-beta.2
 	github.com/thedevsaddam/gojsonq/v2 v2.5.2
 	github.com/urfave/cli/v2 v2.3.0
 	golang.org/x/text v0.3.7

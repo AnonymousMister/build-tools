@@ -1,3 +1,5 @@
+github.com/AnonymousMister/dingtalk-robot v0.0.1-beta.2 h1:+2aA+Okp7nfZhIFKBQLQgeYRfYXy/6A+vW2TDJ0/B0U=
+github.com/AnonymousMister/dingtalk-robot v0.0.1-beta.2/go.mod h1:l1igM+BKMSxz9RV4O7RSvFhERRPmSMGk6BkegN6qO5g=
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
 github.com/cpuguy83/go-md2man/v2 v2.0.0-20190314233015-f79a8a8ca69d h1:U+s90UTSYgptZMwQh2aRr3LuazLJIa+Pg3Kc1ylSYVY=
 github.com/cpuguy83/go-md2man/v2 v2.0.0-20190314233015-f79a8a8ca69d/go.mod h1:maD7wRr/U5Z6m/iR4s+kqSMx2CaBsrgA7czyZG/E6dU=

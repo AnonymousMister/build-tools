@@ -2,6 +2,7 @@ package main
 
 import (
 	"build-tools/artifacts"
+	"build-tools/dingding"
 	"build-tools/docker"
 	"build-tools/java"
 	"build-tools/ks"
@@ -23,6 +24,7 @@ func main() {
 			&docker.DockerCommand,
 			&node.NpmCommand,
 			&ks.KS,
+			&dingding.DingdingCommand,
 		},
 		Version: "0.1",
 	}
