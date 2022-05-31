@@ -1,6 +1,6 @@
 package glb
 
-var IsDebug bool = true
+var IsDebug bool = false
 
 var Con = &Context{}
 
