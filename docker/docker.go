@@ -81,15 +81,7 @@ func steprDocker(c *cli.Context) error {
 		Option:         option,
 		commandName:    commandName,
 	}
-	err := docker.Build()
-	if err != nil {
-		return err
-	}
-	err = docker.Tag()
-	if err != nil {
-		return err
-	}
-	err = docker.Push()
+	err := docker.BuildX()
 	if err != nil {
 		return err
 	}
@@ -153,12 +145,13 @@ func (d *Docker) Rmi() error {
 	if d.Option != nil && len(d.Option) > 0 {
 		options = append(options, d.Option...)
 	}
+	options = append(options, "rmi")
 	for _, tag := range d.Tags {
-		params := append(options, "rmi", d.DockerRegistry+":"+tag)
-		_, err := exec.ExecCommand(d.commandName, params)
-		if err != nil {
-			return err
-		}
+		options = append(options, d.DockerRegistry+":"+tag)
+	}
+	_, err := exec.ExecCommand(d.commandName, options)
+	if err != nil {
+		return err
 	}
 	return nil
 }
