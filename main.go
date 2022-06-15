@@ -3,6 +3,7 @@ package main
 import (
 	"build-tools/artifacts"
 	"build-tools/docker"
+	"build-tools/file"
 	"build-tools/java"
 	"build-tools/ks"
 	"build-tools/node"
@@ -23,6 +24,7 @@ func main() {
 			&docker.DockerCommand,
 			&node.NpmCommand,
 			&ks.KS,
+			&file.PomfileCommand,
 		},
 		Version: "0.1",
 	}
