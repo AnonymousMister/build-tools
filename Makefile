@@ -1,4 +1,4 @@
-build-no: build-liunx build-windows build-darwin
+build-no: build-liunx build-windows build-darwin arm64-linux
 
 build: push-linux build-windows build-darwin
 
@@ -17,3 +17,8 @@ build-darwin:main.go
 
 push-linux: build-liunx
 	scp lib/tools-liunx root@192.168.1.227:/home/config
+
+
+arm64-linux:main.go
+	GO111MODULE=on CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build  -ldflags "-s -w" -a -o build-tools .
+	mv build-tools ./lib/tools-arm64

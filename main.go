@@ -4,6 +4,7 @@ import (
 	"build-tools/artifacts"
 	"build-tools/docker"
 	"build-tools/file"
+	image_syncer "build-tools/image-syncer"
 	"build-tools/java"
 	"build-tools/ks"
 	"build-tools/node"
@@ -25,6 +26,7 @@ func main() {
 			&node.NpmCommand,
 			&ks.KS,
 			&file.PomfileCommand,
+			&image_syncer.ImageSyncerCommand,
 		},
 		Version: "0.1",
 	}
