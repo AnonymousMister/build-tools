@@ -10,6 +10,7 @@ import (
 	"sort"
 	"strings"
 	sync2 "sync"
+	"time"
 )
 
 // Client describes a synchronization client
@@ -143,37 +144,29 @@ func (c *Client) Run() {
 
 	// generate goroutines to handle sync tasks
 	openRoutinesHandleTaskAndWaitForFinish()
-
+	// 监听状态
+	go func() {
+		time.Sleep(time.Second * 3)
+		for {
+			time.Sleep(time.Second * 3)
+			cd := len(c.tasksChan)
+			if cd == 0 {
+				break
+			}
+			fmt.Println("监听同步任务处理完成...还剩下【%v】", cd)
+		}
+	}()
 	// generate sync tasks
 	openRoutinesGenTaskAndWaitForFinish()
-
 	fmt.Println("Start to handle sync tasks, please wait ...")
-
-	for times := 0; times < c.retries; times++ {
-		if c.failedTaskGenerateList.Len() != 0 {
-			c.urlPairList.PushBackList(c.failedTaskGenerateList)
-			c.failedTaskGenerateList.Init()
-			// retry to generate task
-			fmt.Println("Start to retry to generate sync tasks, please wait ...")
-			openRoutinesGenTaskAndWaitForFinish()
-		}
-
-		if c.failedTaskList.Len() != 0 {
-			for e := c.failedTaskList.Front(); e != nil; e = e.Next() {
-				c.tasksChan <- e.Value.(*sync.Task)
-			}
-		}
-
-		if c.taskList.Len() != 0 {
-			// retry to handle task
-			fmt.Println("Start to retry sync tasks, please wait ...")
-			// openRoutinesHandleTaskAndWaitForFinish()
-		}
-	}
 	for {
-		if len(c.tasksChan) == 0 {
+		cd := len(c.tasksChan)
+		if cd == 0 {
+			time.Sleep(time.Second * 3)
 			close(c.tasksChan)
 			break
+		} else {
+			fmt.Println("等待同步任务处理完成...还剩下【%v】", cd)
 		}
 	}
 	fmt.Printf("Finished, %v sync tasks failed, %v tasks generate failed\n", c.failedTaskList.Len(), c.failedTaskGenerateList.Len())
