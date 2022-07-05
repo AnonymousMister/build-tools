@@ -5,12 +5,11 @@ import (
 )
 
 func TestExecKubectl(t *testing.T) {
-
 	eks := &ExecKubectl{
 		Search: &Kubectl{
-			Namespace: "wjrb",
+			Namespace: "scygkj",
 			Deployment: &Deployment{
-				Name: "wjrb-test",
+				Imtag: "dslyht",
 			},
 		},
 	}

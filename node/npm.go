@@ -5,7 +5,6 @@ import (
 	"build-tools/glb"
 	"fmt"
 	"github.com/urfave/cli/v2"
-	"strings"
 )
 
 var NpmCommand = cli.Command{
@@ -42,8 +41,7 @@ func InitNpmFlag() []cli.Flag {
 }
 
 type Npm struct {
-	options []string
-	profile string
+	node
 }
 
 func (n *Npm) RunProfile() error {
@@ -67,25 +65,17 @@ func npm(c *cli.Context) error {
 	fmt.Println("********************************************")
 	fmt.Println("***********     npm 阶段开始    ***********")
 	fmt.Println("********************************************")
-	var options []string
-	option := c.String("npm-option")
+	config := make(map[string]string)
+
 	taobao := c.Bool("npm-taobao")
 	if taobao {
-		index := strings.Index(option, "--registry")
-		if index == -1 {
-			options = append(options, "--registry=https://registry.npmmirror.com")
-		}
-		index = strings.Index(option, "--disturl")
-		if index == -1 {
-			options = append(options, "--disturl=https://npmmirror.com/mirrors/node")
-		}
+		config["registry"] = "https://registry.npmmirror.com"
+		config["disturl"] = "https://npmmirror.com/mirrors/node"
 	}
-	if option != "" {
-		options = append(options, option)
+
+	npm := node{
+		commandName: "npm",
+		config:      config,
 	}
-	npm := Npm{
-		options: options,
-		profile: c.String("npm-profile"),
-	}
-	return npm.RunProfile()
+	return npm.Run(c.String("npm-profile"))
 }

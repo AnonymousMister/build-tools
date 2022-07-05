@@ -127,7 +127,7 @@ func (c *Client) Run() {
 					if err := task.Run(); err != nil {
 						c.logger.Infof("执行出现错误 线程【%d】", i)
 						// put to failedTaskList
-						c.PutAFailedTask(task)
+						// c.PutAFailedTask(task)
 					}
 					c.logger.Infof("执行结束 线程【%d】", i)
 				}
@@ -148,7 +148,7 @@ func (c *Client) Run() {
 	go func() {
 		time.Sleep(time.Second * 3)
 		for {
-			time.Sleep(time.Second * 3)
+			time.Sleep(time.Duration(180) * time.Second)
 			cd := len(c.tasksChan)
 			if cd == 0 {
 				break
@@ -162,7 +162,7 @@ func (c *Client) Run() {
 	for {
 		cd := len(c.tasksChan)
 		if cd == 0 {
-			time.Sleep(time.Second * 3)
+			time.Sleep(time.Duration(180) * time.Second)
 			close(c.tasksChan)
 			break
 		} else {

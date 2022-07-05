@@ -3,6 +3,7 @@ package ks
 import (
 	"build-tools/glb"
 	"build-tools/step"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/urfave/cli/v2"
@@ -61,6 +62,11 @@ func steprks(c *cli.Context) error {
 			Deployment: dep,
 		},
 	}
+	b, a := json.Marshal(eks)
+	if a != nil {
+		fmt.Println("ks json marshal error:", a)
+	}
+	fmt.Println("ks json marshal :", b)
 	e := eks.SearchDeployment()
 	if e != nil {
 		return e

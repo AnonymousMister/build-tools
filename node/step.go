@@ -15,7 +15,9 @@ func init() {
 	step.RegisterStepFlag(InitNpmFlag())
 }
 func stepNode(c *cli.Context) error {
-	if exec.CheckFileIsExist("package-lock.json") {
+	if exec.CheckFileIsExist("pnpm-lock.yaml") {
+		return pnpm(c)
+	} else if exec.CheckFileIsExist("package-lock.json") {
 		return npm(c)
 	} else if exec.CheckFileIsExist("package.json") {
 		return npm(c)
