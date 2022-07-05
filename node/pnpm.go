@@ -15,7 +15,7 @@ func pnpm(c *cli.Context) error {
 	fmt.Println("********************************************")
 	config := make(map[string]string)
 	taobao := c.Bool("npm-taobao")
-	config["registry"] = "/home/cache/.pnpm-store"
+	config["store-dir"] = "/home/cache/.pnpm-store"
 	if taobao {
 		config["registry"] = "https://registry.npmmirror.com"
 		config["disturl"] = "https://npmmirror.com/mirrors/node"
