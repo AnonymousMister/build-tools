@@ -19,12 +19,27 @@ func pnpm(c *cli.Context) error {
 	if taobao {
 		config["registry"] = "https://registry.npmmirror.com"
 		config["disturl"] = "https://npmmirror.com/mirrors/node"
+		config["cache"] = "/home/cache/.npm/.cache/cnpm"
+
 	}
 	npm := Pnpm{
 		node{
 			commandName: "pnpm",
 			config:      config,
 		},
+	}
+	e := npm.SetConfigs()
+	if e != nil {
+		return e
+	}
+	shamefully := c.Bool("pnpm-shamefully-hoist")
+	if shamefully {
+		e = npm.Install("--shamefully-hoist")
+	} else {
+		e = npm.Install()
+	}
+	if e != nil {
+		return e
 	}
 	return npm.Run(c.String("npm-profile"))
 }

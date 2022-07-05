@@ -36,6 +36,12 @@ func InitNpmFlag() []cli.Flag {
 			EnvVars: []string{"TAOBAO_AGENT"},
 			Value:   true,
 		},
+		&cli.BoolFlag{
+			Name:    "pnpm-shamefully-hoist",
+			Usage:   `是否 扁平化安装 （兼容老框架）`,
+			EnvVars: []string{"PNPM_SHAMEFULLY_HOIST"},
+			Value:   false,
+		},
 	}
 	return flag
 }
@@ -44,10 +50,20 @@ type Npm struct {
 	node
 }
 
-func (n *Npm) RunProfile() error {
-	option := append(n.options, "run")
-	if n.profile != "" {
-		option = append(option, n.profile)
+func npm(c *cli.Context) error {
+	fmt.Println("********************************************")
+	fmt.Println("***********     npm 阶段开始    ***********")
+	fmt.Println("********************************************")
+	config := make(map[string]string)
+	taobao := c.Bool("npm-taobao")
+	if taobao {
+		config["registry"] = "https://registry.npmmirror.com"
+		config["disturl"] = "https://npmmirror.com/mirrors/node"
+		config["cache"] = "/home/cache/.npm/.cache/cnpm"
+	}
+	npm := node{
+		commandName: "npm",
+		config:      config,
 	}
 	if glb.IsDebug {
 		exec.ExecCommand("nvm", []string{
@@ -55,27 +71,13 @@ func (n *Npm) RunProfile() error {
 			"v14.19.1",
 		})
 	}
-
-	_, e := exec.ExecCommand("npm", option)
-
-	return e
-}
-
-func npm(c *cli.Context) error {
-	fmt.Println("********************************************")
-	fmt.Println("***********     npm 阶段开始    ***********")
-	fmt.Println("********************************************")
-	config := make(map[string]string)
-
-	taobao := c.Bool("npm-taobao")
-	if taobao {
-		config["registry"] = "https://registry.npmmirror.com"
-		config["disturl"] = "https://npmmirror.com/mirrors/node"
+	e := npm.SetConfigs()
+	if e != nil {
+		return e
 	}
-
-	npm := node{
-		commandName: "npm",
-		config:      config,
+	e = npm.Install()
+	if e != nil {
+		return e
 	}
 	return npm.Run(c.String("npm-profile"))
 }

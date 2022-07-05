@@ -23,10 +23,8 @@ func (d *node) SetConfig(key, value string) error {
 	return e
 }
 
-func (d *node) Install() error {
-	_, e := exec.ExecCommand(d.commandName, []string{
-		"install",
-	})
+func (d *node) Install(Options ...string) error {
+	_, e := exec.ExecCommand(d.commandName, append([]string{"install"}, Options...))
 	return e
 }
 
