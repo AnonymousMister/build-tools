@@ -7,9 +7,9 @@ import (
 func TestExecKubectl(t *testing.T) {
 	eks := &ExecKubectl{
 		Search: &Kubectl{
-			Namespace: "scygkj",
+			Namespace: "ynrhjc",
 			Deployment: &Deployment{
-				Imtag: "dslyht",
+				Imtag: "rhjcjava",
 			},
 		},
 	}

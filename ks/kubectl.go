@@ -20,11 +20,17 @@ type Deployment struct {
 
 type serch = func(q *gojsonq.JSONQ) *gojsonq.JSONQ
 
-func (d *Kubectl) SearchDeployment(Json string) (*Kubectl, error) {
-	deployment := &Deployment{}
+func (d *Kubectl) SearchDeployment(Json string) ([]*Kubectl, error) {
+	kubectls := make([]*Kubectl, 0)
+	// 获取 metadata 过滤选项
 	metadatas := d.searchDeploymentMetadata()
 	deploymentJson := gojsonq.New().FromString(Json).From("items")
-	deploymentObjects := metadatas(deploymentJson).Get().([]interface{})
+	// 执行 过滤 和 过滤 replicas 有效果的 数据
+	aa := metadatas(deploymentJson).WhereNotEqual("spec.replicas", 0).Get()
+	if aa == nil {
+		return nil, errors.New("没有找到 下发对象")
+	}
+	deploymentObjects := aa.([]interface{})
 	if it := len(deploymentObjects); it > 0 {
 		containers := d.searchDeploymentContainers()
 		for i := 0; i < it; i++ {
@@ -34,6 +40,7 @@ func (d *Kubectl) SearchDeployment(Json string) (*Kubectl, error) {
 			o := containers(containersJson).First()
 			if o != nil {
 				mapo := o.(map[string]interface{})
+				deployment := &Deployment{}
 				deployment.ImName = mapo["name"].(string)
 				images := strings.Split(mapo["image"].(string), ":")
 				deployment.Image = images[0]
@@ -42,17 +49,17 @@ func (d *Kubectl) SearchDeployment(Json string) (*Kubectl, error) {
 				}
 				name := containersJson.Reset().Find("metadata.name")
 				deployment.Name = name.(string)
-				break
+				kubectls = append(kubectls, &Kubectl{
+					Namespace:  d.Namespace,
+					Deployment: deployment,
+				})
 			}
 		}
 	}
-	if deployment.Name == "" {
+	if len(kubectls) == 0 {
 		return nil, errors.New("没有找到 下发对象")
 	}
-	return &Kubectl{
-		Namespace:  d.Namespace,
-		Deployment: deployment,
-	}, nil
+	return kubectls, nil
 }
 
 func (d *Kubectl) searchDeploymentMetadata() serch {
