@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+
 	"github.com/urfave/cli/v2"
 )
 
@@ -66,7 +67,7 @@ func steprks(c *cli.Context) error {
 	if a != nil {
 		fmt.Println("ks json marshal error:", a)
 	}
-	fmt.Println("ks json marshal :", b)
+	fmt.Println("ks json marshal :", string(b))
 	e := eks.SearchDeployment()
 	if e != nil {
 		return e
