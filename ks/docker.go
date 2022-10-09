@@ -24,11 +24,11 @@ func findSearchDeployment() *Deployment {
 	dep := &Deployment{}
 	dep.Image = glb.Con.Docker.DockerRegistry
 	if len(glb.Con.Docker.Tags) > 1 {
-		tag := strings.Split(glb.Con.Docker.Tags[0], "-")
-		if len(tag) > 1 {
-			a := tag[len(tag)-1]
+		tag := glb.Con.Docker.Tags[0]
+		tagIndex := strings.Index(tag, "-")
+		if tagIndex > 1 && tagIndex < len(tag) {
+			dep.Imtag = string([]rune(tag)[tagIndex+1:])
 			dep.Image = ""
-			dep.Imtag = a
 		}
 	}
 	return dep

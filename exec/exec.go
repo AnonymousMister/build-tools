@@ -5,10 +5,11 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"golang.org/x/text/encoding/simplifiedchinese"
 	"io"
 	"os"
 	"os/exec"
+
+	"golang.org/x/text/encoding/simplifiedchinese"
 )
 
 type Charset string
@@ -18,8 +19,18 @@ const (
 	GB18030 = Charset("GB18030")
 )
 
-//封装一个函数来执行命令
+// 封装一个函数来执行命令
+func ExecNoCommand(commandName string, params []string) (string, error) {
+	return ExecInfoCommand(commandName, params, false)
+}
+
 func ExecCommand(commandName string, params []string) (string, error) {
+
+	return ExecInfoCommand(commandName, params, true)
+}
+
+// 封装一个函数来执行命令
+func ExecInfoCommand(commandName string, params []string, info bool) (string, error) {
 	//执行命令
 	cmd := exec.Command(commandName, params...)
 	//显示运行的命令
@@ -35,7 +46,9 @@ func ExecCommand(commandName string, params []string) (string, error) {
 		in := bufio.NewScanner(stdout)
 		for in.Scan() {
 			cmdRe := ConvertByte2String(in.Bytes(), "UTF8")
-			fmt.Println(cmdRe)
+			if info {
+				fmt.Println(cmdRe)
+			}
 			buf.WriteString(cmdRe)
 		}
 	}(infoBuf)
@@ -59,7 +72,7 @@ func ExecCommand(commandName string, params []string) (string, error) {
 	return infoBuf.String(), nil
 }
 
-//开启一个协程来输出错误
+// 开启一个协程来输出错误
 func handlerErr(errReader io.ReadCloser) {
 	in := bufio.NewScanner(errReader)
 	for in.Scan() {
@@ -85,7 +98,7 @@ func CheckFileIsExist(filename string) bool {
 	return exist
 }
 
-//对字符进行转码
+// 对字符进行转码
 func ConvertByte2String(byte []byte, charset Charset) string {
 	var str string
 	switch charset {

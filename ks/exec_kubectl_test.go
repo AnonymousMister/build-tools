@@ -16,7 +16,6 @@ func TestExecKubectl(t *testing.T) {
 		},
 	}
 	b, _ := json.Marshal(eks)
-
 	fmt.Println("ks json marshal :", string(b))
 	err := eks.SearchDeployment()
 	if err != nil {

@@ -13,7 +13,7 @@ type ExecKubectl struct {
 }
 
 func (d *ExecKubectl) SearchDeployment() (e error) {
-	d.Json, e = exec.ExecCommand("kubectl", []string{
+	d.Json, e = exec.ExecNoCommand("kubectl", []string{
 		"get", "Deployment", "-n" + d.Search.Namespace, "-ojson",
 	})
 	if e != nil {
