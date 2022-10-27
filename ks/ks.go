@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/urfave/cli/v2"
 )
@@ -57,20 +58,43 @@ func steprks(c *cli.Context) error {
 	if deploymentName != "" {
 		dep.Name = deploymentName
 	}
-	eks := &ExecKubectl{
-		Search: &Kubectl{
-			Namespace:  namespace,
-			Deployment: dep,
-		},
+	namespaces := namespaceGrouping(namespace)
+
+	errorList := []error{}
+	for _, namespace := range namespaces {
+		eks := &ExecKubectl{
+			Search: &Kubectl{
+				Namespace:  namespace,
+				Deployment: dep,
+			},
+		}
+		b, a := json.Marshal(eks)
+		if a != nil {
+			fmt.Println("ks json marshal error:", a)
+		}
+		fmt.Println("ks json marshal :", string(b))
+		e := eks.SearchDeployment()
+		if e != nil {
+			return e
+		}
+		error := eks.SetImage(glb.Con.Docker.Tags[0])
+		if error != nil {
+			errorList = append(errorList, error)
+		}
+
 	}
-	b, a := json.Marshal(eks)
-	if a != nil {
-		fmt.Println("ks json marshal error:", a)
+	if len(errorList) > 0 {
+		errorString := ""
+		for _, e := range errorList {
+			fmt.Println(e)
+			errorString += e.Error() + "\n"
+		}
+		return errors.New(errorString)
 	}
-	fmt.Println("ks json marshal :", string(b))
-	e := eks.SearchDeployment()
-	if e != nil {
-		return e
-	}
-	return eks.SetImage(glb.Con.Docker.Tags[0])
+	return nil
+}
+
+func namespaceGrouping(namespace string) []string {
+
+	return strings.Split(namespace, ",")
 }

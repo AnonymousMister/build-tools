@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-func TestWebHook(t *testing.T) {
+func TestKs(t *testing.T) {
 	//初始化
 	glb.Con.Docker = &glb.DockerContext{
 		Tags:           []string{"e1b7fdb9-rhjcht-new", "latest-rhjcht-new"},
